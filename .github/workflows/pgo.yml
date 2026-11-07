@@ -1,0 +1,34 @@
+name: Build Custom PGO Emulator
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    runs-on: windows-2022
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup MSVC Compiler
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Install glslang Dependency
+        run: |
+          vcpkg install glslang:x64-windows
+          echo "VCPKG_ROOT=$env:VCPKG_INSTALLATION_ROOT" >> $env:GITHUB_ENV
+          echo "$env:VCPKG_INSTALLATION_ROOT\installed\x64-windows\tools\glslang" >> $env:GITHUB_PATH
+
+      - name: Configure CMake Setup
+        run: cmake -B build -G "Visual Studio 17 2022" -A x64 -DCMAKE_TOOLCHAIN_FILE="${{ env:VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake"
+
+      - name: Build with PGO Optimization
+        run: cmake --build build --config Release -- /p:LinkTimeCodeGeneration=PGInstrument
+
+      - name: Upload Optimized Executable
+        uses: actions/upload-artifact@v4
+        with:
+          name: Lichii-PGO-SurfaceBook
+          path: build/Release/
