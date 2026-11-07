@@ -21,7 +21,7 @@ jobs:
           echo "C:\ProgramData\chocolatey\bin" >> $env:GITHUB_PATH
 
       - name: Configure CMake Setup
-        run: cmake -B build -G "Visual Studio 17 2022" -A x64
+        run: cmake -B build -G "Visual Studio 17 2022" -A x64 -DGLSLANGVALIDATOR="C:/ProgramData/chocolatey/bin/glslangValidator.exe"
 
       - name: Build with PGO Optimization
         run: cmake --build build --config Release -- /p:LinkTimeCodeGeneration=PGInstrument
