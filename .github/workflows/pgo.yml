@@ -18,11 +18,10 @@ jobs:
       - name: Install glslang Dependency
         run: |
           vcpkg install glslang:x64-windows
-          echo "VCPKG_ROOT=$env:VCPKG_INSTALLATION_ROOT" >> $env:GITHUB_ENV
           echo "$env:VCPKG_INSTALLATION_ROOT\installed\x64-windows\tools\glslang" >> $env:GITHUB_PATH
 
       - name: Configure CMake Setup
-        run: cmake -B build -G "Visual Studio 17 2022" -A x64 -DCMAKE_TOOLCHAIN_FILE="${{ env:VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake"
+        run: cmake -B build -G "Visual Studio 17 2022" -A x64 -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake"
 
       - name: Build with PGO Optimization
         run: cmake --build build --config Release -- /p:LinkTimeCodeGeneration=PGInstrument
